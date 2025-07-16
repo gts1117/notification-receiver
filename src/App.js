@@ -12,12 +12,12 @@ import { Copy, Trash2, Server, Code, Terminal, Sparkles, X, BrainCircuit, FileTe
 // IMPORTANT: Replace this with the configuration object from your Firebase project.
 // Go to your Firebase Console -> Project Settings -> General -> Your apps -> Firebase SDK snippet -> Config
 const firebaseConfig = {
-    apiKey: "AIzaSyA3BaMo5wUDAnN-R24J1cBMQwO7kolXHnY",
+    apiKey: "PASTE API KEY HERE",
     authDomain: "notification-receiver-g1.firebaseapp.com",
     projectId: "notification-receiver-g1",
     storageBucket: "notification-receiver-g1.firebasestorage.app",
-    messagingSenderId: "442112140332",
-    appId: "1:442112140332:web:2c3ae34d6cbf23df191d89"
+    messagingSenderId: "PASTE SENDER ID HERE",
+    appId: "PASTE APP ID HERE"
 };
 
 // This is part of the path where your data is stored.
@@ -30,7 +30,7 @@ async function callGemini(prompt) {
     // 1. Visit https://aistudio.google.com/app/apikey
     // 2. Create an API key.
     // 3. Paste it here.
-    const apiKey = "AIzaSyAJS54hEXUVqHJZM8cuAJtXPGq4jyApsac";
+    const apiKey = "PASTE YOUR GEMINI API KEY HERE";
     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
     if (apiKey === "PASTE_YOUR_GEMINI_API_KEY_HERE") {
