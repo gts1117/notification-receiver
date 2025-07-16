@@ -12,12 +12,12 @@ import { Copy, Trash2, Server, Code, Terminal, Sparkles, X, BrainCircuit, FileTe
 // IMPORTANT: Replace this with the configuration object from your Firebase project.
 // Go to your Firebase Console -> Project Settings -> General -> Your apps -> Firebase SDK snippet -> Config
 const firebaseConfig = {
-    apiKey: "PASTE API KEY HERE",
+    apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
     authDomain: "notification-receiver-g1.firebaseapp.com",
     projectId: "notification-receiver-g1",
     storageBucket: "notification-receiver-g1.firebasestorage.app",
-    messagingSenderId: "PASTE SENDER ID HERE",
-    appId: "PASTE APP ID HERE"
+    messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+    appId: process.env.REACT_APP_FIREBASE_APP_ID
 };
 
 // This is part of the path where your data is stored.
@@ -30,10 +30,10 @@ async function callGemini(prompt) {
     // 1. Visit https://aistudio.google.com/app/apikey
     // 2. Create an API key.
     // 3. Paste it here.
-    const apiKey = "PASTE YOUR GEMINI API KEY HERE";
+    const apiKey = process.env.REACT_APP_GEMINI_API_KEY;
     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
-    if (apiKey === "PASTE_YOUR_GEMINI_API_KEY_HERE") {
+    if (!apiKey || apiKey === "PASTE_YOUR_GEMINI_API_KEY_HERE") {
         return "Error: Please add your Gemini API key to the `callGemini` function in `App.js` to enable AI features.";
     }
 
@@ -89,7 +89,7 @@ export default function App() {
     useEffect(() => {
         try {
             // Check if firebaseConfig is filled out
-            if (firebaseConfig.apiKey.startsWith("PASTE_YOUR")) {
+            if (!firebaseConfig.apiKey || firebaseConfig.apiKey.startsWith("PASTE_YOUR")) {
                 setError("Firebase is not configured. Please add your Firebase project configuration to App.js.");
                 setIsLoading(false);
                 return;
@@ -318,7 +318,7 @@ function SidebarContent({ userId }) {
             <h2 className="text-xl font-semibold mb-4 text-cyan-300">How to Send Data</h2>
             <div className="space-y-4">
                 {instructionSections.map(section => (
-                    <InstructionPanel 
+                    <InstructionPanel
                         key={section.id}
                         title={section.title}
                         icon={section.icon}
@@ -356,7 +356,7 @@ function NotificationCard({ notification, onAnalyze }) {
                         Open Print File
                     </a>
                 )}
-                <button 
+                <button
                     onClick={() => onAnalyze(notification)}
                     className="inline-flex items-center px-3 py-1 text-xs font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm transition-colors"
                 >
@@ -429,4 +429,3 @@ style.textContent = `
 .prose ul { list-style-type: disc; padding-left: 1.5em; }
 `;
 document.head.appendChild(style);
-
