@@ -1,4 +1,7 @@
 ﻿import React, { useState, useEffect, useRef } from 'react';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import Home from './Home';
+import Navbar from './Navbar';
 
 // Firebase Imports
 import { initializeApp } from 'firebase/app';
@@ -11,7 +14,7 @@ import { Copy, Trash2, Server, Code, Terminal, Sparkles, X, BrainCircuit, FileTe
 // --- Firebase Configuration ---
 // IMPORTANT: Replace this with the configuration object from your Firebase project.
 // Go to your Firebase Console -> Project Settings -> General -> Your apps -> Firebase SDK snippet -> Config
-const firebaseConfig = {
+export const firebaseConfig = {
     apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
     authDomain: "notification-receiver-g1.firebaseapp.com",
     projectId: "notification-receiver-g1",
@@ -222,58 +225,66 @@ Format your response clearly using Markdown.`;
     };
 
     return (
-        <div className="bg-gray-900 text-gray-100 min-h-screen font-sans flex flex-col lg:flex-row">
-            <main className="flex-1 p-4 sm:p-6 lg:p-8 flex flex-col max-h-screen">
-                <header className="flex-shrink-0 flex flex-wrap gap-4 justify-between items-center pb-4 border-b border-gray-700">
-                    <div>
-                        <h1 className="text-2xl sm:text-3xl font-bold text-white">Notification Receiver</h1>
-                        <p className="text-sm text-gray-400 mt-1">Listening for data sent to your unique endpoint.</p>
+        <Router>
+            <Navbar />
+            <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/dashboard" element={
+                    <div className="bg-gray-900 text-gray-100 min-h-screen font-sans flex flex-col lg:flex-row">
+                        <main className="flex-1 p-4 sm:p-6 lg:p-8 flex flex-col max-h-screen">
+                            <header className="flex-shrink-0 flex flex-wrap gap-4 justify-between items-center pb-4 border-b border-gray-700">
+                                <div>
+                                    <h1 className="text-2xl sm:text-3xl font-bold text-white">Notification Receiver</h1>
+                                    <p className="text-sm text-gray-400 mt-1">Listening for data sent to your unique endpoint.</p>
+                                </div>
+                                <div className="flex gap-2">
+                                    <button onClick={handleSummarizeAll} disabled={notifications.length === 0 || isAnalyzing} className="flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg shadow-md transition-all duration-200">
+                                        <FileText size={16} className="mr-2" />
+                                        ✨ Summarize
+                                    </button>
+                                    <button onClick={handleClearNotifications} disabled={notifications.length === 0} className="flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg shadow-md transition-all duration-200">
+                                        <Trash2 size={16} className="mr-2" />
+                                        Clear All
+                                    </button>
+                                    <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="p-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors">
+                                        {isSidebarOpen ? <PanelRightClose size={20} /> : <PanelRightOpen size={20} />}
+                                    </button>
+                                </div>
+                            </header>
+
+                            <div className="flex-grow bg-gray-800 rounded-lg mt-6 shadow-inner overflow-y-auto p-4">
+                                {isLoading && <div className="text-center p-10">Loading...</div>}
+                                {error && <div className="text-center p-10 text-red-400">{error}</div>}
+                                {!isLoading && !error && notifications.length === 0 && (
+                                    <div className="text-center p-10 text-gray-400">
+                                        <Server size={48} className="mx-auto mb-4" />
+                                        <h3 className="text-lg font-semibold">Awaiting Notifications</h3>
+                                        <p>Send data to this receiver using the instructions on the right.</p>
+                                    </div>
+                                )}
+
+                                {!isLoading && !error && notifications.length > 0 && (
+                                    <div className="space-y-4">
+                                        {notifications.map(n => (
+                                            <NotificationCard key={n.id} notification={n} onAnalyze={handleAnalyzeNotification} />
+                                        ))}
+                                        <div ref={notificationsEndRef} />
+                                    </div>
+                                )}
+                            </div>
+                        </main>
+
+                        <aside className={`bg-gray-900/50 border-t lg:border-t-0 lg:border-l border-gray-700 transition-all duration-300 ease-in-out overflow-hidden ${isSidebarOpen ? 'w-full p-4 sm:p-6 lg:w-1/3 xl:w-1/4' : 'w-0 p-0'}`}>
+                            <div className="sticky top-6 min-w-[300px]">
+                                <SidebarContent userId={userId} />
+                            </div>
+                        </aside>
+
+                        <AnalysisModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={modalTitle} content={modalContent} isLoading={isAnalyzing} />
                     </div>
-                    <div className="flex gap-2">
-                        <button onClick={handleSummarizeAll} disabled={notifications.length === 0 || isAnalyzing} className="flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg shadow-md transition-all duration-200">
-                            <FileText size={16} className="mr-2" />
-                            ✨ Summarize
-                        </button>
-                        <button onClick={handleClearNotifications} disabled={notifications.length === 0} className="flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg shadow-md transition-all duration-200">
-                            <Trash2 size={16} className="mr-2" />
-                            Clear All
-                        </button>
-                        <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="p-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors">
-                            {isSidebarOpen ? <PanelRightClose size={20} /> : <PanelRightOpen size={20} />}
-                        </button>
-                    </div>
-                </header>
-
-                <div className="flex-grow bg-gray-800 rounded-lg mt-6 shadow-inner overflow-y-auto p-4">
-                    {isLoading && <div className="text-center p-10">Loading...</div>}
-                    {error && <div className="text-center p-10 text-red-400">{error}</div>}
-                    {!isLoading && !error && notifications.length === 0 && (
-                        <div className="text-center p-10 text-gray-400">
-                            <Server size={48} className="mx-auto mb-4" />
-                            <h3 className="text-lg font-semibold">Awaiting Notifications</h3>
-                            <p>Send data to this receiver using the instructions on the right.</p>
-                        </div>
-                    )}
-
-                    {!isLoading && !error && notifications.length > 0 && (
-                        <div className="space-y-4">
-                            {notifications.map(n => (
-                                <NotificationCard key={n.id} notification={n} onAnalyze={handleAnalyzeNotification} />
-                            ))}
-                            <div ref={notificationsEndRef} />
-                        </div>
-                    )}
-                </div>
-            </main>
-
-            <aside className={`bg-gray-900/50 border-t lg:border-t-0 lg:border-l border-gray-700 transition-all duration-300 ease-in-out overflow-hidden ${isSidebarOpen ? 'w-full p-4 sm:p-6 lg:w-1/3 xl:w-1/4' : 'w-0 p-0'}`}>
-                <div className="sticky top-6 min-w-[300px]">
-                    <SidebarContent userId={userId} />
-                </div>
-            </aside>
-
-            <AnalysisModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={modalTitle} content={modalContent} isLoading={isAnalyzing} />
-        </div>
+                } />
+            </Routes>
+        </Router>
     );
 }
 
