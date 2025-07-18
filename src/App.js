@@ -346,9 +346,24 @@ function NotificationCard({ notification, onAnalyze }) {
                 <span className={`font-bold ${headerColor} break-all`}>{source || 'Unknown Source'}</span>
                 <span className="text-xs text-gray-400 flex-shrink-0">{formattedTime}</span>
             </div>
-            <pre className="bg-gray-900/70 p-3 rounded text-sm text-gray-300 whitespace-pre-wrap break-words">
-                {JSON.stringify(data, null, 2)}
-            </pre>
+            <div className="bg-gray-900/70 p-3 rounded text-sm text-gray-300 whitespace-pre-wrap break-words">
+                {Object.entries(data).map(([key, value]) => (
+                    <div key={key} className="mb-1">
+                        <span className="font-semibold text-gray-400">{key}:</span>
+                        {key === 'imageUrl' ? (
+                            value !== "No image found" ? (
+                                <a href={value} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
+                                    View Image
+                                </a>
+                            ) : (
+                                <span className="ml-1">No image found</span>
+                            )
+                        ) : (
+                            <span className="ml-1">{String(value)}</span>
+                        )}
+                    </div>
+                ))}
+            </div>
             <div className="mt-3 flex justify-end items-center gap-2">
                 {isPrintPetition && url && (
                     <a href={url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center px-3 py-1 text-xs font-medium text-white bg-pink-600 hover:bg-pink-700 rounded-lg shadow-sm transition-colors">
